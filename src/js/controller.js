@@ -3,6 +3,7 @@ import 'regenerator-runtime/runtime';
 
 import * as model from './model';
 import recipeView from './views/recipeView';
+import searchView from './views/searchView';
 
 const recipeContainer = document.querySelector('.recipe');
 
@@ -33,11 +34,30 @@ const controlRecipe = async function () {
     // render recipe
     recipeView.render(model.state.recipe);
   } catch (err) {
-    alert(err);
+    // alert(err);
+    recipeView.renderError();
   }
 };
 controlRecipe();
 
-['hashchange', 'load'].forEach(ev =>
-  window.addEventListener(ev, controlRecipe)
-);
+const controlSearchResult = async function () {
+  try {
+    // 1. Get search query
+    const query = searchView.getQuery();
+    if (!query) return;
+
+    // 2. Load search query
+    await model.loadSearchResult(query);
+
+    // 3. Render search
+    console.log(model.state.search.results);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const init = function () {
+  recipeView.addHandlerRender(controlRecipe);
+  searchView.addHandlerSearch(controlSearchResult);
+};
+init();
