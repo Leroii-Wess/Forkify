@@ -4,18 +4,11 @@ import 'regenerator-runtime/runtime';
 import * as model from './model';
 import recipeView from './views/recipeView';
 import searchView from './views/searchView';
+import resultsView from './views/resultsView';
 
-const recipeContainer = document.querySelector('.recipe');
-
-const timeout = function (s) {
-  return new Promise(function (_, reject) {
-    setTimeout(function () {
-      reject(new Error(`Request took too long! Timeout after ${s} second`));
-    }, s * 1000);
-  });
-};
-
-// https://forkify-api.herokuapp.com/v2
+if (module.hot) {
+  module.hot.accept();
+}
 
 ///////////////////////////////////////
 
@@ -42,6 +35,8 @@ controlRecipe();
 
 const controlSearchResult = async function () {
   try {
+    resultsView.renderSpinner();
+
     // 1. Get search query
     const query = searchView.getQuery();
     if (!query) return;
@@ -50,7 +45,7 @@ const controlSearchResult = async function () {
     await model.loadSearchResult(query);
 
     // 3. Render search
-    console.log(model.state.search.results);
+    resultsView.render(model.state.search.results);
   } catch (err) {
     console.log(err);
   }
